@@ -49,11 +49,11 @@ GRPO 的特点：
   = \mathbb{E}_{\mathbf{q}\sim\mathcal{D},\,\{\mathbf{o}_i\}\sim\pi_{\text{old}}}
     \frac{1}{\sum_{i=1}^{G}|\mathbf{o}_i|}
     \sum_{i=1}^G\sum_{t=1}^{|\mathbf{o}_i|}
-    \left[
+    \bigl[
       \min\big(r_{i,t}(\theta)\hat{A}_{i,t},
                \text{clip}(r_{i,t}(\theta);1-\epsilon_l,1+\epsilon_h)\hat{A}_{i,t}\big)
       - \beta\,\mathbb{D}_{\mathrm{KL}}\!\big[\pi_\theta\|\pi_{\text{ref}}\big]
-    \right].
+    \bigr].
   $$
 
 - 其中：
@@ -92,11 +92,11 @@ J_{\text{GRPO}}(\theta)
 = \mathbb{E}_{\mathbf{q}\sim\mathcal{D},\,\{\mathbf{o}_i\}\sim\pi_{\text{old}}}
   \frac{1}{\sum_{i=1}^G|\mathbf{o}_i|}
   \sum_{i=1}^G\sum_{t=1}^{|\mathbf{o}_i|}
-  \left\{
+  \Big\{
     \min\!\big(r_{i,t}(\theta)\,\hat{A}_{i,t},\,
                \mathrm{clip}(r_{i,t}(\theta);1-\epsilon_l,1+\epsilon_h)\,\hat{A}_{i,t}\big)
     - \beta\,D_{\mathrm{KL}}[\pi_\theta\Vert\pi_{\mathrm{ref}}]
-  \right\},
+  \Big\},
 $$
 
 其中
@@ -133,9 +133,9 @@ $$
 $$
 J_{\text{GRPO}}(\theta)
 = \mathbb{E}_{\mathbf{q},\{\mathbf{o}_i\}}
-  \left[
+  \Big[
     f(\theta;\mathbf{q},\{\mathbf{o}_i\})
-  \right],
+  \Big],
 $$
 
 其中
@@ -144,10 +144,10 @@ $$
 f(\theta;\mathbf{q},\{\mathbf{o}_i\})
 = \frac{1}{\sum_{i=1}^G|\mathbf{o}_i|}
   \sum_{i=1}^G\sum_{t=1}^{|\mathbf{o}_i|}
-  \left\{
+  \Big\{
     \min(\cdots)
     - \beta\,D_{\mathrm{KL}}[\pi_\theta\Vert\pi_{\mathrm{ref}}]
-  \right\}.
+  \Big\}.
 $$
 
 因为 $p(\mathbf{q},\{\mathbf{o}_i\})$ 不依赖于 $\theta$，对 $\theta$ 求导时，它就像“常数权重”，所以我们可以安全地把梯度运算**移进期望里面**：
@@ -156,9 +156,9 @@ $$
 \nabla_\theta J_{\text{GRPO}}(\theta)
 = \mathbb{E}_{\mathbf{q},\{\mathbf{o}_i\}}
   \nabla_\theta
-  \left[
+  \Big[
     f(\theta;\mathbf{q},\{\mathbf{o}_i\})
-  \right].
+  \Big].
 $$
 
 把 $f$ 展开：
@@ -167,10 +167,10 @@ $$
 \nabla_\theta J_{\text{GRPO}}(\theta)
 = \mathbb{E}_{\mathbf{q},\{\mathbf{o}_i\}}
   \nabla_\theta
-  \left[
+  \Big[
     \frac{1}{\sum_i|\mathbf{o}_i|}
     \sum_{i,t} \big( \cdots \big)
-  \right].
+  \Big].
 $$
 
 这一步可以理解成：先固定一个 batch，看 “这个 batch 的 loss 对 $\theta$ 的导数”，然后再对所有 batch 做平均（期望）。
@@ -183,10 +183,10 @@ $$
   \frac{1}{\sum_i|\mathbf{o}_i|}
   \sum_{i,t}
   \nabla_\theta
-  \left\{
+  \Big\{
     \min(\cdots)
     - \beta\,D_{\mathrm{KL}}[\pi_\theta\Vert\pi_{\mathrm{ref}}]
-  \right\}.
+  \Big\}.
 $$
 
 接下来只需计算每个 $(i,t)$ 的那一项的梯度。
@@ -305,8 +305,8 @@ $$
 
 $$
 \nabla_\theta D_{\mathrm{KL}}\big[\pi_\theta\Vert\pi_{\mathrm{ref}}\big]
-= \left(1 - \frac{\pi_{\mathrm{ref}}(o_{i,t}\mid\cdot)}
-               {\pi_\theta(o_{i,t}\mid\cdot)}\right)
+= \Big(1 - \frac{\pi_{\mathrm{ref}}(o_{i,t}\mid\cdot)}
+               {\pi_\theta(o_{i,t}\mid\cdot)}\Big)
    \nabla_\theta \log\pi_\theta(o_{i,t}\mid\cdot).
 $$
 
@@ -314,10 +314,10 @@ $$
 
 $$
 \nabla_\theta\big[-\beta D_{\mathrm{KL}}\big]
-= \beta\left(
+= \beta\Big(
      \frac{\pi_{\mathrm{ref}}(o_{i,t}\mid\cdot)}
           {\pi_\theta(o_{i,t}\mid\cdot)} - 1
-   \right)\nabla_\theta \log\pi_\theta(o_{i,t}\mid\cdot).
+   \Big)\nabla_\theta \log\pi_\theta(o_{i,t}\mid\cdot).
 $$
 
 **(5) 把两部分合并，得到 token 级的 $w_{i,t}$**
@@ -329,14 +329,14 @@ $$
 = \mathbb{E}_{\mathbf{q},\{\mathbf{o}_i\}}
   \frac{1}{\sum_i|\mathbf{o}_i|}
   \sum_{i,t}
-  \left[
+  \Big[
     r_{i,t}(\theta)\,\hat{A}_{i,t}\,
     \mathbb{I}_{\mathrm{trust}}(r_{i,t},\hat{A}_{i,t})
-    + \beta\left(
+    + \beta\Big(
         \frac{\pi_{\mathrm{ref}}(o_{i,t}\mid\cdot)}
              {\pi_\theta(o_{i,t}\mid\cdot)} - 1
-      \right)
-  \right]\,
+      \Big)
+  \Big]\,
   \nabla_\theta \log\pi_\theta(o_{i,t}\mid\cdot).
 $$
 
@@ -349,10 +349,10 @@ w_{i,t}
 = \underbrace{
    \frac{\pi_\theta(o_{i,t})}{\pi_{\text{old}}(o_{i,t})}\,
    \hat{A}_{i,t}\,
-   \mathbb{I}_{\text{trust}}\!\left(
+   \mathbb{I}_{\text{trust}}\!\Big(
      \tfrac{\pi_\theta(o_{i,t})}{\pi_{\text{old}}(o_{i,t})},
      \hat{A}_{i,t}
-   \right)
+   \Big)
  }_{\text{policy gradient 项}}
  + \underbrace{
    \beta\,\frac{\pi_{\text{ref}}(o_{i,t})}{\pi_\theta(o_{i,t})} - \beta
@@ -372,7 +372,7 @@ $$
     可以看成“这个 token 在当前样本里 reward/advantage 的信号”，adv 为正就希望它的概率上升，adv 为负就希望它下降；
   - KL 那一部分：
     $$
-    \beta\left(\frac{\pi_{\text{ref}}(o_{i,t})}{\pi_\theta(o_{i,t})}-1\right)
+    \beta\Big(\frac{\pi_{\text{ref}}(o_{i,t})}{\pi_\theta(o_{i,t})}-1\Big)
     $$
     则是“对齐参考模型”的信号：当当前模型比参考模型更喜欢这个 token 时（比值大于 1），倾向于往回拉一点；反之则推一推。
   - 这两块加起来，就形成了 $w_{i,t}$：它决定了“总体上是鼓励还是打压这个 token（符号）”、“用多大的力度（绝对值大小）”。
@@ -405,7 +405,7 @@ $$
 $$
 \pi_j = \frac{e^{z_j}}{\sum_\ell e^{z_\ell}},
 \qquad
-\log\pi_j = z_j - \log\left(\sum_\ell e^{z_\ell}\right).
+\log\pi_j = z_j - \log\Big(\sum_\ell e^{z_\ell}\Big).
 $$
 
 对单个分量 $z_k$ 求偏导：
@@ -425,10 +425,10 @@ $$
 
   $$
   \frac{\partial}{\partial z_k}
-  \log\left(\sum_\ell e^{z_\ell}\right)
+  \log\Big(\sum_\ell e^{z_\ell}\Big)
   = \frac{1}{\sum_\ell e^{z_\ell}}
     \cdot \frac{\partial}{\partial z_k}
-           \left(\sum_\ell e^{z_\ell}\right)
+           \Big(\sum_\ell e^{z_\ell}\Big)
   = \frac{e^{z_k}}{\sum_\ell e^{z_\ell}}
   = \pi_k,
   $$
@@ -534,7 +534,7 @@ $$
 
 $$
 \delta_\ell(o_{i,t})
-= \left(\prod_{j=\ell+1}^{L} J_j^\top\right)\;
+= \Big(\prod_{j=\ell+1}^{L} J_j^\top\Big)\;
   w_{i,t}\,\nabla_z \log\pi_\theta(o_{i,t}).
 $$
 
